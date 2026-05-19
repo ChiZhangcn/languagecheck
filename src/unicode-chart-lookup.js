@@ -129,6 +129,7 @@ function getSpecificChartEntries(chartEntries) {
 function getCoveragePolicy(scriptName, chartLabel) {
   if (
     chartLabel === scriptName ||
+    scriptName.startsWith(`${chartLabel} `) ||
     chartLabel === `${scriptName} (ASCII)` ||
     chartLabel === `Basic ${scriptName}` ||
     chartLabel.startsWith(`Basic ${scriptName} `)
