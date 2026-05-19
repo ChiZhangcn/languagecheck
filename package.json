@@ -1,0 +1,29 @@
+{
+  "name": "languagecheck",
+  "version": "1.0.0",
+  "description": "Read supported characters and Unicode code points from TTF or OTF font files.",
+  "main": "src/index.js",
+  "scripts": {
+    "generate-unicode-data": "node scripts/generate-unicode-chart-data.js",
+    "generate-language-script-data": "node scripts/generate-language-script-data.js",
+    "generate-google-language-data": "node scripts/generate-google-language-data.js",
+    "generate-language-translation-data": "node scripts/generate-language-translation-data.js",
+    "generate-language-population-data": "node scripts/generate-language-population-data.js",
+    "generate-cjk-standard-data": "node scripts/generate-cjk-standard-data.js",
+    "start": "node src/server.js",
+    "read-font": "node src/cli.js",
+    "test": "node --test"
+  },
+  "bin": {
+    "font-unicode-reader": "src/cli.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1",
+    "fontkit": "^2.0.4",
+    "multer": "^2.1.1"
+  }
+}

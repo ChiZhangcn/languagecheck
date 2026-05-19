@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Font Unicode Reader</title>
+    <link rel="stylesheet" href="/styles.css?v=non-cjk-script-title-1" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <p class="eyebrow">TTF / OTF Unicode Explorer</p>
+        <h1>字符/编码/语言检查器</h1>
+        <p class="hero-copy">
+          上传一个字体文件，页面会自动解析出它支持的全部字符、Unicode 编码、十进制码点和 glyph 信息。
+        </p>
+      </header>
+
+      <main class="workspace">
+        <section class="panel upload-panel">
+          <div>
+            <p class="section-kicker">Upload Font</p>
+            <h2>选择一个字体文件</h2>
+            <p class="section-copy">支持 `.ttf` 和 `.otf`，上传后会立即在本地服务端解析。</p>
+          </div>
+
+          <form id="upload-form" class="upload-form">
+            <label class="file-dropzone" for="font-file">
+              <input id="font-file" name="fontFile" type="file" accept=".ttf,.otf,font/ttf,font/otf" required />
+              <span class="dropzone-title">拖入字体文件，或点击这里选择</span>
+              <span class="dropzone-subtitle">本地解析，不需要手动输入命令</span>
+              <span id="selected-file" class="selected-file">还没有选择文件</span>
+            </label>
+
+            <div class="form-actions">
+              <button id="submit-button" type="submit">开始解析</button>
+              <button id="download-button" type="button" class="secondary" disabled>下载 JSON</button>
+            </div>
+          </form>
+
+          <p id="status-message" class="status-message" aria-live="polite">等待上传字体文件。</p>
+        </section>
+
+        <section class="panel summary-panel">
+          <div class="summary-head">
+            <div>
+              <p class="section-kicker">Font Snapshot</p>
+              <h2>解析结果</h2>
+            </div>
+          </div>
+
+          <div id="summary-cards" class="summary-cards">
+            <article class="summary-card">
+              <span class="summary-label">Font</span>
+              <strong>等待解析</strong>
+            </article>
+            <article class="summary-card">
+              <span class="summary-label">Family</span>
+              <strong>等待解析</strong>
+            </article>
+            <article class="summary-card">
+              <span class="summary-label">Visible</span>
+              <strong>0</strong>
+            </article>
+            <article class="summary-card">
+              <span class="summary-label">Filtered</span>
+              <strong>0</strong>
+            </article>
+            <article class="summary-card">
+              <span class="summary-label">Scripts</span>
+              <strong>0</strong>
+            </article>
+          </div>
+
+          <section class="script-coverage" aria-labelledby="script-coverage-title">
+            <div class="script-coverage-head">
+              <div>
+                <p class="section-kicker">Script Coverage</p>
+                <h3 id="script-coverage-title">字体支持的 Scripts 和对应语言（非 CJK）</h3>
+              </div>
+              <div class="script-coverage-actions">
+                <label class="language-source-select">
+                  <span>语言数据源</span>
+                  <select id="language-data-source">
+                    <option value="wikiUnicode">Wiki+Unicode</option>
+                    <option value="google">Google 数据</option>
+                  </select>
+                </label>
+                <label class="top-language-toggle">
+                  <input id="top-language-toggle" type="checkbox" />
+                  <span>Only display Top 200 most spoken languages</span>
+                </label>
+                <div class="language-export-actions">
+                  <button id="export-languages-en" type="button" class="secondary" disabled>导出语言（英文）</button>
+                  <button id="export-languages-zh" type="button" class="secondary" disabled>导出语言（中文）</button>
+                </div>
+                <p id="script-coverage-count" class="result-count">还没有结果</p>
+              </div>
+            </div>
+            <div class="script-coverage-shell">
+              <table class="script-coverage-table">
+                <thead>
+                  <tr>
+                    <th>
+                      <span>Scripts</span>
+                      <button
+                        id="script-column-resizer"
+                        class="column-resizer"
+                        type="button"
+                        aria-label="调整 Scripts 和对应语言两列的宽度"
+                        aria-valuemin="25"
+                        aria-valuemax="75"
+                        aria-valuenow="58"
+                      ></button>
+                    </th>
+                    <th>对应语言</th>
+                  </tr>
+                </thead>
+                <tbody id="script-coverage-body">
+                  <tr>
+                    <td colspan="2" class="empty-cell">上传字体后，这里会列出它覆盖到的 scripts 和语言。</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div id="script-threshold-notices" class="script-threshold-notices" hidden></div>
+          </section>
+
+          <section class="cjk-standard-check" aria-labelledby="cjk-standard-check-title">
+            <div class="completeness-head">
+              <div>
+                <p class="section-kicker">CJK Standard Check</p>
+                <h3 id="cjk-standard-check-title">CJK 字符集标准覆盖率</h3>
+              </div>
+              <p id="cjk-standard-count" class="result-count">还没有结果</p>
+            </div>
+            <div id="cjk-standard-list" class="completeness-list">
+              <div class="empty-cell">上传 CJK 字体后，这里会显示中日韩相关字符集标准的覆盖比例。</div>
+            </div>
+          </section>
+
+          <section class="completeness-check" aria-labelledby="completeness-check-title">
+            <div class="completeness-head">
+              <div>
+                <p class="section-kicker">Completeness Check</p>
+                <h3 id="completeness-check-title">Script Unicode Block 覆盖完整性</h3>
+              </div>
+              <p id="completeness-count" class="result-count">还没有结果</p>
+            </div>
+            <div id="completeness-list" class="completeness-list">
+              <div class="empty-cell">上传字体后，这里会显示每个 script 的 Unicode block 覆盖比例。</div>
+            </div>
+          </section>
+
+          <div class="filters">
+            <label class="search-field">
+              <span>搜索字符 / Unicode / Block / Family / Script / Glyph</span>
+              <input id="search-input" type="search" placeholder="例如 A, U+4E2D, Devanagari, South Asian Scripts" disabled />
+            </label>
+            <div class="result-controls">
+              <p id="result-count" class="result-count">还没有结果</p>
+              <div id="pagination" class="pagination" hidden>
+                <button id="prev-page" type="button" class="secondary">上一页</button>
+                <span id="page-label">第 1 页</span>
+                <button id="next-page" type="button" class="secondary">下一页</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-shell">
+            <table>
+              <thead>
+                <tr>
+                  <th>字符</th>
+                  <th>Unicode</th>
+                  <th>Block</th>
+                  <th>Family</th>
+                  <th>Script</th>
+                  <th>十进制</th>
+                  <th>Glyph ID</th>
+                  <th>Glyph Name</th>
+                </tr>
+              </thead>
+              <tbody id="results-body">
+                <tr>
+                  <td colspan="8" class="empty-cell">上传字体后，这里会出现完整字符表。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/app.js?v=non-cjk-script-title-1" defer></script>
+  </body>
+</html>
